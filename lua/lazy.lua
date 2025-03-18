@@ -1,3 +1,5 @@
+local osys = require("cmake-tools.osys")
+
 return {
 	{ -- This plugin
 		"Zeioth/makeit.nvim",
@@ -260,13 +262,40 @@ return {
 	},
 	{
 		"nvim-neotest/neotest",
+		event = "VeryLazy",
 		dependencies = {
 			"nvim-neotest/nvim-nio",
 			"nvim-lua/plenary.nvim",
 			"antoinemadec/FixCursorHold.nvim",
-			"nvim-treesitter/nvim-treesitter"
+			"nvim-treesitter/nvim-treesitter",
+			"alfaix/neotest-gtest"
 		},
+		config = function()
+			require("neotest").setup({
+				adapters = {
+					require("neotest-gtest").setup({})
+				}
+			})
+		end
 	},
+	{
+		"Civitasv/cmake-tools.nvim",
+		opts = {
+			cmake_build_directory = function()
+				if osys.iswin32 then
+					return "build\\${variant:buildType}"
+				end
+				return "build/${variant:buildType}"
+			end,                               -- specifies the generated directory, allowing macro expansion
+			cmake_soft_link_compile_commands = true, -- creates a soft link for compile_commands.json at the project root
+			cmake_compile_commands_from_lsp = false, -- disables setting compile commands file location via LSP
+			cmake_kits_path = nil,             -- specify global CMake kits path if needed
+			cmake_variants_message = {
+				short = { show = true },       -- shows a short message for variant selection
+				long = { show = true, max_length = 40 }, -- shows a longer message with a max length of 40 characters
+			},
+		},
+	}
 	{
 		"rcarriga/nvim-dap-ui",
 		event = "VeryLazy",
