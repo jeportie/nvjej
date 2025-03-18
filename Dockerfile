@@ -27,6 +27,15 @@ COPY script/install.dockerfile /tmp/install.dockerfile
 RUN chmod +x /tmp/install.dockerfile
 RUN bash /tmp/install.dockerfile && rm /tmp/install.dockerfile
 
+RUN apt-get update && apt-get install -y \
+    libgtest-dev && \
+    cd /usr/src/gtest && \
+    cmake . && \
+    make && \
+    cp lib/*.a /usr/lib/ && \
+    ldconfig
+
+
 # Create a Python virtual environment and install : 
 # pip, setuptools, pynvim and norminette ************************************* #
 RUN python3 -m venv /root/venv && \
@@ -43,6 +52,7 @@ RUN touch ~/.zsh_history && chmod 600 ~/.zsh_history
 RUN npm i @vscode/codicons
 COPY custom/custom_agnoster.zsh-theme /root/.oh-my-zsh/themes/agnoster.zsh-theme
 COPY config/nvjej.zshrc /root/.zshrc
+COPY config/allman.clang-format /root/.clang-format-styles/Allman
 
 # Set the entrypoint to launch the customized shell ************************** #
 COPY script/entrypoint.sh /sh/entrypoint.sh

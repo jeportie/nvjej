@@ -72,18 +72,29 @@ sepcat() {
 }
 
 cform() {
-  # Define the available styles.
-  local styles=("LLVM" "Google" "Chromium" "Mozilla" "WebKit" "Microsoft" "GNU")
-  
+  local builtin_styles=("LLVM" "Google" "Chromium" "Mozilla" "WebKit" "Microsoft" "GNU")
+  local custom_styles_dir="$HOME/.clang-format-styles"
+  local custom_styles=($(ls "$custom_styles_dir"))
+  local styles=("${builtin_styles[@]}" "${custom_styles[@]}")
+
   echo "Select a clang-format style:"
   select style in "${styles[@]}"; do
-    if [[ -n $style ]]; then
-      ~/.local/share/nvim/mason/bin/clang-format --style "$style" --dump-config > .clang-format
-      echo ".clang-format file created with style $style"
-      break
-    else
+    if [[ -z "$style" ]]; then
       echo "Invalid selection. Please try again."
+      continue
     fi
+
+    if [[ " ${builtin_styles[@]} " =~ " ${style} " ]]; then
+      ~/.local/share/nvim/mason/bin/clang-format --style "$style" --dump-config > .clang-format
+      echo ".clang-format file created with built-in style: $style"
+    elif [[ -f "${custom_styles_dir}/${style}" ]]; then
+      cp "${custom_styles_dir}/${style}" .clang-format
+      echo ".clang-format file created with custom style: $style"
+    else
+      echo "Selected style not found. Please try again."
+      continue
+    fi
+    break
   done
 }
 

@@ -16,15 +16,15 @@
 SRC_DIR="src"
 BAK_DIR=".bak"
 
-# Function to generate the list of .c files recursively in src/ and subdirectories
+# Function to generate the list of .cpp files recursively in src/ and subdirectories
 generate_src_list() {
-    find $1 -name "*.c"
+    find $1 -name "*.cpp"
 }
 
-# Scan for all .c files in the src directory recursively
+# Scan for all .cpp files in the src directory recursively
 SRC_FILES=$(generate_src_list "$SRC_DIR")
 
-# Define the start and end markers for the C file list in your Makefile
+# Define the start and end markers for the file list in your Makefile
 START_MARKER="### BEGIN AUTO GENERATED FILES ###"
 END_MARKER="### END AUTO GENERATED FILES ###"
 
@@ -73,4 +73,4 @@ mv Makefile.bak $BAK_DIR/
 # Remove the temporary file
 rm -f $TEMP_FILE
 
-echo "Makefile updated with new .c files. Backup stored in .bak/"
+echo "Makefile updated with new .cpp files. Backup stored in .bak/"
