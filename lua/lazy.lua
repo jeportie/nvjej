@@ -295,7 +295,7 @@ return {
 				long = { show = true, max_length = 40 }, -- shows a longer message with a max length of 40 characters
 			},
 		},
-	}
+	},
 	{
 		"rcarriga/nvim-dap-ui",
 		event = "VeryLazy",
