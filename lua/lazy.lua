@@ -1,5 +1,3 @@
-local osys = require("cmake-tools.osys")
-
 return {
 	{ -- This plugin
 		"Zeioth/makeit.nvim",
@@ -280,21 +278,139 @@ return {
 	},
 	{
 		"Civitasv/cmake-tools.nvim",
-		opts = {
-			cmake_build_directory = function()
-				if osys.iswin32 then
-					return "build\\${variant:buildType}"
-				end
-				return "build/${variant:buildType}"
-			end,                               -- specifies the generated directory, allowing macro expansion
-			cmake_soft_link_compile_commands = true, -- creates a soft link for compile_commands.json at the project root
-			cmake_compile_commands_from_lsp = false, -- disables setting compile commands file location via LSP
-			cmake_kits_path = nil,             -- specify global CMake kits path if needed
-			cmake_variants_message = {
-				short = { show = true },       -- shows a short message for variant selection
-				long = { show = true, max_length = 40 }, -- shows a longer message with a max length of 40 characters
-			},
-		},
+		event = "VeryLazy",
+		opts = {}
+		-- opts = (function()
+		-- 	local sysname = vim.loop.os_uname().sysname
+		-- 	local is_win = sysname == "Windows_NT"
+		-- 	return {
+		-- 		cmake_command = "cmake", -- specify cmake command path
+		-- 		ctest_command = "ctest", -- specify ctest command path
+		-- 		cmake_use_preset = true,
+		-- 		cmake_regenerate_on_save = true, -- auto generate when saving CMakeLists.txt
+		-- 		cmake_generate_options = { "-DCMAKE_EXPORT_COMPILE_COMMANDS=1" },
+		-- 		cmake_build_options = {},
+		-- 		-- support macro expansion: ${kit}, ${kitGenerator}, ${variant:xx}
+		-- 		cmake_build_directory = function()
+		-- 			if is_win then
+		-- 				return "build\\${variant:buildType}"
+		-- 			end
+		-- 			return "build/${variant:buildType}"
+		-- 		end,
+		-- 		cmake_soft_link_compile_commands = true,
+		-- 		cmake_compile_commands_from_lsp = false,
+		-- 		cmake_kits_path = nil,
+		-- 		cmake_variants_message = {
+		-- 			short = { show = true },
+		-- 			long = { show = true, max_length = 40 },
+		-- 		},
+		-- 		cmake_dap_configuration = { -- debug settings for cmake
+		-- 			name = "cpp",
+		-- 			type = "codelldb",
+		-- 			request = "launch",
+		-- 			stopOnEntry = false,
+		-- 			runInTerminal = true,
+		-- 			console = "integratedTerminal",
+		-- 		},
+		-- 		cmake_executor = {
+		-- 			name = "quickfix",
+		-- 			opts = {},
+		-- 			default_opts = {
+		-- 				quickfix = {
+		-- 					show = "always",
+		-- 					position = "belowright",
+		-- 					size = 10,
+		-- 					encoding = "utf-8",
+		-- 					auto_close_when_success = true,
+		-- 				},
+		-- 				toggleterm = {
+		-- 					direction = "float",
+		-- 					close_on_exit = false,
+		-- 					auto_scroll = true,
+		-- 					singleton = true,
+		-- 				},
+		-- 				overseer = {
+		-- 					new_task_opts = {
+		-- 						strategy = {
+		-- 							"toggleterm",
+		-- 							direction = "horizontal",
+		-- 							auto_scroll = true,
+		-- 							quit_on_exit = "success"
+		-- 						}
+		-- 					},
+		-- 					on_new_task = function(task)
+		-- 						require("overseer").open({ enter = false, direction = "right" })
+		-- 					end,
+		-- 				},
+		-- 				terminal = {
+		-- 					name = "Main Terminal",
+		-- 					prefix_name = "[CMakeTools]: ",
+		-- 					split_direction = "horizontal",
+		-- 					split_size = 11,
+		-- 					single_terminal_per_instance = true,
+		-- 					single_terminal_per_tab = true,
+		-- 					keep_terminal_static_location = true,
+		-- 					auto_resize = true,
+		-- 					start_insert = false,
+		-- 					focus = false,
+		-- 					do_not_add_newline = false,
+		-- 				},
+		-- 			},
+		-- 		},
+		-- 		cmake_runner = {
+		-- 			name = "terminal",
+		-- 			opts = {},
+		-- 			default_opts = {
+		-- 				quickfix = {
+		-- 					show = "always",
+		-- 					position = "belowright",
+		-- 					size = 10,
+		-- 					encoding = "utf-8",
+		-- 					auto_close_when_success = true,
+		-- 				},
+		-- 				toggleterm = {
+		-- 					direction = "float",
+		-- 					close_on_exit = false,
+		-- 					auto_scroll = true,
+		-- 					singleton = true,
+		-- 				},
+		-- 				overseer = {
+		-- 					new_task_opts = {
+		-- 						strategy = {
+		-- 							"toggleterm",
+		-- 							direction = "horizontal",
+		-- 							auto_scroll = true,
+		-- 							quit_on_exit = "success"
+		-- 						}
+		-- 					},
+		-- 					on_new_task = function(task)
+		-- 						-- Optional: define a callback if needed
+		-- 					end,
+		-- 				},
+		-- 				terminal = {
+		-- 					name = "Main Terminal",
+		-- 					prefix_name = "[CMakeTools]: ",
+		-- 					split_direction = "horizontal",
+		-- 					split_size = 11,
+		-- 					single_terminal_per_instance = true,
+		-- 					single_terminal_per_tab = true,
+		-- 					keep_terminal_static_location = true,
+		-- 					auto_resize = true,
+		-- 					start_insert = false,
+		-- 					focus = false,
+		-- 					do_not_add_newline = false,
+		-- 				},
+		-- 			},
+		-- 		},
+		-- 		cmake_notifications = {
+		-- 			runner = { enabled = true },
+		-- 			executor = { enabled = true },
+		-- 			spinner = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" },
+		-- 			refresh_rate_ms = 100,
+		-- 		},
+		-- 		cmake_virtual_text_support = true,
+		-- 	}
+		-- end)(),
 	},
 	{
 		"rcarriga/nvim-dap-ui",
@@ -360,5 +476,30 @@ return {
 				automatic_installation = true, -- Automatically install missing LSP servers
 			})
 		end,
-	}
+	},
+	{
+		"folke/lazydev.nvim",
+		ft = "lua", -- only load on lua files
+		opts = {
+			library = {
+				{ path = "${3rd}/luv/library", words = { "vim%.uv" } },
+			},
+		},
+	},
+	{
+		"hrsh7th/nvim-cmp",
+		opts = function(_, opts)
+			opts.sources = opts.sources or {}
+			table.insert(opts.sources, {
+				name = "lazydev",
+				group_index = 0, -- set group index to 0 to skip loading LuaLS completions
+			})
+		end,
+	},
+	{
+		'numToStr/Comment.nvim',
+		opts = {
+			-- add any options here
+		}
+	},
 }
