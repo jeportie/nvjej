@@ -22,6 +22,7 @@ nvjej() {
             -v ~/local/share/nvim:/root/.local/share/nvim \
             -v ~/cache/nvim:/root/.cache/nvim \
             -v ~/local/state/nvim:/root/.local/state/nvim \
+            -v ~/ai_api_keys.conf:/root/ai_api_keys.conf:ro \
             -e DISPLAY=$DISPLAY \
             -w "/root/projects/$folder_name" \
             jeportie/nvjej:latest
@@ -34,6 +35,7 @@ nvjej() {
             -v ~/local/share/nvim:/root/.local/share/nvim \
             -v ~/cache/nvim:/root/.cache/nvim \
             -v ~/local/state/nvim:/root/.local/state/nvim \
+            -v ~/ai_api_keys.conf:/root/ai_api_keys.conf:ro \
             -e DISPLAY=$DISPLAY \
             jeportie/nvjej:latest
     fi
