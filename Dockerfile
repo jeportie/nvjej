@@ -27,15 +27,6 @@ COPY script/install.dockerfile /tmp/install.dockerfile
 RUN chmod +x /tmp/install.dockerfile
 RUN bash /tmp/install.dockerfile && rm /tmp/install.dockerfile
 
-RUN apt-get update && apt-get install -y \
-    libgtest-dev && \
-    cd /usr/src/gtest && \
-    cmake . && \
-    make && \
-    cp lib/*.a /usr/lib/ && \
-    ldconfig
-
-
 # Create a Python virtual environment and install : 
 # pip, setuptools, pynvim and norminette ************************************* #
 RUN python3 -m venv /root/venv && \
@@ -53,6 +44,7 @@ RUN npm i @vscode/codicons
 COPY custom/custom_agnoster.zsh-theme /root/.oh-my-zsh/themes/agnoster.zsh-theme
 COPY config/nvjej.zshrc /root/.zshrc
 COPY config/allman.clang-format /root/.clang-format-styles/Allman
+COPY config/mcpservers.json /root/.mcp/mcpservers.json
 
 # Set the entrypoint to launch the customized shell ************************** #
 COPY script/entrypoint.sh /sh/entrypoint.sh
@@ -69,24 +61,15 @@ RUN wget https://github.com/neovim/neovim/releases/download/v0.10.4/nvim-linux-x
 RUN git clone https://github.com/NvChad/starter ~/.config/nvim && \
     rm -rf ~/.config/nvim/.git
 
-# Install Lua Interpreters *************************************************** #
-RUN apt-get update && apt-get install -y \
-    lua5.3 lua5.3-dev \
-    lua5.1 lua5.1-dev && \
-    rm -rf /var/lib/apt/lists/*
-
-# LuaRocks and Lua Modules Installation ************************************** #
-RUN wget https://luarocks.org/releases/luarocks-3.11.1.tar.gz && \
-    tar zxpf luarocks-3.11.1.tar.gz && \
-    cd luarocks-3.11.1 && \
-    ./configure && make && make install && \
-    luarocks install luasocket && \
-    luarocks install busted && \
-    luarocks --lua-version=5.1 install vusted && \
-    cd .. && rm -rf luarocks-3.11.1 luarocks-3.11.1.tar.gz
-
 # Bash Scripts copy ********************************************************** #
 COPY script/update_makefile.sh /sh/update_makefile.sh
+
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash && \
+    . ~/.nvm/nvm.sh && \
+    nvm install node
+
+#RUN nvm install v22.14.0 
+#RUN npm install -g mcp-hub@1.7.1
 
 RUN nvim --headless +"Lazy! sync" +qa
 
@@ -108,4 +91,3 @@ RUN nvim --headless +"Lazy! sync" +qa
 RUN cp -r /root/.cache /root/.default.cache
 RUN cp -r /root/.config /root/.default.config
 RUN cp -r /root/.local /root/.default.local
-

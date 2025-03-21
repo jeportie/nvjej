@@ -40,6 +40,8 @@ alias vi="vim"
 vim() {
     FLAG="/root/.cache/nvim/mason_installed.flag"
     if [ ! -f "$FLAG" ]; then
+		nvm install v22.14.0 
+		npm install -g mcp-hub@1.7.1
         nvim -c 'MasonInstall clang-format codelldb' -c "TSInstall c cpp bash cmake make" "$@"
         # Create the flag file so we don't run initialization again
         touch "$FLAG"

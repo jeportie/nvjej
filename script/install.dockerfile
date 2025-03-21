@@ -26,6 +26,7 @@ apt-get update && apt-get install -y \
     ripgrep \
     curl \
     wget \
+	npm \
 	expect \
     unzip \
     tar \
@@ -66,7 +67,33 @@ apt-get update && apt-get install -y \
     rm -rf /var/lib/apt/lists/*
 
 # Node.js Environment
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh
+nvm install v22.14.0
+
+# Google Test Install
 apt-get update && apt-get install -y \
-    nodejs \
-    npm && \
+    libgtest-dev && \
+    cd /usr/src/gtest && \
+    cmake . && \
+    make && \
+    cp lib/*.a /usr/lib/ && \
+    ldconfig
+
+# Install Lua Interpreters *************************************************** #
+apt-get update && apt-get install -y \
+    lua5.3 lua5.3-dev \
+    lua5.1 lua5.1-dev && \
     rm -rf /var/lib/apt/lists/*
+
+# LuaRocks and Lua Modules Installation ************************************** #
+wget https://luarocks.org/releases/luarocks-3.11.1.tar.gz && \
+    tar zxpf luarocks-3.11.1.tar.gz && \
+    cd luarocks-3.11.1 && \
+    ./configure && make && make install && \
+    luarocks install luasocket && \
+    luarocks install busted && \
+    luarocks --lua-version=5.1 install vusted && \
+    cd .. && rm -rf luarocks-3.11.1 luarocks-3.11.1.tar.gz
+
+# Install MCP Hub
+npm install -g mcp-hub@1.7.1

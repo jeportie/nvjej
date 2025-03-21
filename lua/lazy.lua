@@ -91,17 +91,27 @@ return {
 		"yetone/avante.nvim",
 		event = "VeryLazy",
 		lazy = false,
-		version = false, -- Set this to "*" to always pull the latest release version, or set it to false to update to the latest code changes.
+		version = false, -- set this to "*" to always pull the latest release version, or false for latest code changes.
 		opts = {
 			provider = "openai",
 			openai = {
 				endpoint = "https://api.openai.com/v1",
 				model = "gpt-4o", -- your desired model (or use gpt-4o, etc.)
-				timeout = 30000, -- timeout in milliseconds
-				temperature = 0, -- adjust if needed
+				timeout = 30000, -- in milliseconds
+				temperature = 0,
 				max_tokens = 4096,
-				-- reasoning_effort = "high" -- only supported for reasoning models (o1, etc.)
+				-- reasoning_effort = "high", -- if needed for reasoning models
 			},
+			system_prompt = function()
+				local hub = require("mcphub").get_hub_instance()
+				return hub:get_active_servers_prompt()
+			end,
+			custom_tools = function()
+				return {
+					require("mcphub.extensions.avante").mcp_tool(),
+				}
+			end,
+			-- add any other avante configuration options below
 		},
 		build = "make",
 		dependencies = {
@@ -111,8 +121,8 @@ return {
 			"MunifTanjim/nui.nvim",
 			"echasnovski/mini.pick", -- for file_selector provider mini.pick
 			"nvim-telescope/telescope.nvim", -- for file_selector provider telescope
-			"hrsh7th/nvim-cmp",     -- autocompletion for avante commands and mentions
-			"ibhagwan/fzf-lua",     -- for file_selector provider fzf
+			"hrsh7th/nvim-cmp",      -- autocompletion for avante commands and mentions
+			"ibhagwan/fzf-lua",      -- for file_selector provider fzf
 			"nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
 			"zbirenbaum/copilot.lua", -- for providers='copilot'
 			{
@@ -122,18 +132,14 @@ return {
 					default = {
 						embed_image_as_base64 = false,
 						prompt_for_file_name = false,
-						drag_and_drop = {
-							insert_mode = true,
-						},
+						drag_and_drop = { insert_mode = true },
 						use_absolute_path = true,
 					},
 				},
 			},
 			{
 				"MeanderingProgrammer/render-markdown.nvim",
-				opts = {
-					file_types = { "markdown", "Avante" },
-				},
+				opts = { file_types = { "markdown", "Avante" } },
 				ft = { "markdown", "Avante" },
 			},
 		},
@@ -501,5 +507,35 @@ return {
 		opts = {
 			-- add any options here
 		}
+	},
+	{
+		"ravitemer/mcphub.nvim",
+		event = "VeryLazy",
+		dependencies = {
+			"nvim-lua/plenary.nvim", -- Required for Job and HTTP requests
+		},
+		-- cmd = "MCPHub", -- lazily start the hub when `MCPHub` is called
+		build = "npm install -g mcp-hub@latest", -- Installs required mcp-hub npm module
+		config = function()
+			require("mcphub").setup({
+				-- Required options
+				port = 3000,                          -- Port for MCP Hub server
+				config = vim.fn.expand("~/.mcp/mcpservers.json"), -- Absolute path to config file
+
+				-- Optional options
+				on_ready = function(hub)
+					-- Called when hub is ready
+				end,
+				on_error = function(err)
+					-- Called on errors
+				end,
+				log = {
+					level = vim.log.levels.WARN,
+					to_file = false,
+					file_path = nil,
+					prefix = "MCPHub"
+				},
+			})
+		end
 	},
 }
